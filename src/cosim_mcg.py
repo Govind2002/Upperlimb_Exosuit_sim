@@ -148,8 +148,18 @@ class OpenSimMusclePlant:
         for name in MUSCLES:                                                                       # control index 0..5
             brain.addActuator(osim.Muscle.safeDownCast(model.getForceSet().get(name)))            # [verify]
         brain.addActuator(osim.CoordinateActuator.safeDownCast(model.getForceSet().get("exo_elbow_torque")))   # index 6
+
+        #Newly added
+
+        actuators = model.getActuators()
+
         for j in range(7):
-            brain.prescribeControlForActuator(j, osim.Constant(U_MIN if j < 6 else 0.0))          # [verify] int-index overload
+            actuator = actuators.get(j)
+            actuator_name = actuator.getName()
+            control_value = U_MIN if j < 6 else 0.0
+
+            brain.prescribeControlForActuator(actuator_name, osim.Constant(control_value))
+          # [verify] int-index overload
         model.addController(brain)
         self.probe = None
         if metabolics:
@@ -300,7 +310,7 @@ def selftest(a, idm, I_eff):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--plant", choices=["opensim", "mock"], default="mock")
-    ap.add_argument("--model", default="arm26_elbow_payload_2p5kg.osim")
+    ap.add_argument("--model", default=r"models\arm26_elbow_payload_2p5kg.osim")
     ap.add_argument("--payload", type=float, default=2.5)
     ap.add_argument("--nominal", type=float, default=0.0)
     ap.add_argument("--traj", choices=["cosine", "minjerk"], default="cosine")

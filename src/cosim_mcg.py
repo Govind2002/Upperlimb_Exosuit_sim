@@ -309,7 +309,7 @@ def selftest(a, idm, I_eff):
 # =====================================================================================================  main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--plant", choices=["opensim", "mock"], default="mock")
+    ap.add_argument("--plant", choices=["opensim", "mock"], default="opensim")
     ap.add_argument("--model", default=r"models\arm26_elbow_payload_2p5kg.osim")
     ap.add_argument("--payload", type=float, default=2.5)
     ap.add_argument("--nominal", type=float, default=0.0)

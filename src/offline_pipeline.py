@@ -90,18 +90,36 @@ class GC:
 
 
 class AGC:
-    """Gradient adaptation, integrated EXACTLY over each step for constant Z (stable for any dt)."""
-    def __init__(self, gamma=0.025, theta0=(0.1, 0.1, 0.1)):
-        self.th, self.gamma = np.array(theta0, float), gamma
+    """Adaptive Gravity Compensation using the exact paper adaptation law 
+    with Euler integration and projection modification."""
+    def __init__(self, gamma=0.025, theta0=(0.1, 0.1, 0.1), th_min=None, th_max=None):
+        self.th = np.array(theta0, float)
+        self.gamma = gamma  # Corresponds to learning rate / adaptation gain scaling
+        
+        # Projection modification bounds to prevent parameter drift/divergence
+        self.th_min = th_min if th_min is not None else np.array([0.0, 0.0, 0.0])
+        self.th_max = th_max if th_max is not None else np.array([ 5.0,  5.0,  10.0])
 
     def sigma_hat(self):
         return self.th[2]
 
     def update(self, Z, tau_t, dt):
-        zz = float(Z @ Z)
-        if zz > 1e-12:
-            k = 1.0 - np.exp(-self.gamma * zz * dt)
-            self.th += k * Z * (tau_t - Z @ self.th) / zz
+        """
+        Z  : Regressor vector [thdd, thd, g*sin(th)]
+        tau_t: Total torque (tau_h + G*tau_m)
+        dt : Simulation time step
+        """
+        # 1. Compute prediction error xi based on Eq. (20):
+        #    xi = (tau_h + G*tau_m) - Z @ self.th  --> which equals tau_t - Z @ self.th
+        xi = tau_t - (Z @ self.th)
+        
+        # 2. Apply paper's adaptation law Eq. (23): \dot{\hat{\Theta}} = \Lambda^{-1} Z^T \xi[cite: 5]
+        #    Discretized using forward Euler: \hat{\Theta} += dt * \Lambda^{-1} * Z * \xi
+        d_th = self.gamma * Z * xi
+        self.th += d_th * dt
+        
+        # 3. Projection modification: constrain parameter estimates within valid bounds
+        self.th = np.clip(self.th, self.th_min, self.th_max)
 
 
 class Unassisted:

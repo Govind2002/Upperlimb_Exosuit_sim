@@ -311,8 +311,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--plant", choices=["opensim", "mock"], default="opensim")
     ap.add_argument("--model", default=r"models\arm26_elbow_payload_2p5kg.osim")
-    ap.add_argument("--payload", type=float, default=2.5)
-    ap.add_argument("--nominal", type=float, default=0.0)
+    ap.add_argument("--payload", type=float, default=2.7)
+    ap.add_argument("--nominal", type=float, default=2.5)
     ap.add_argument("--traj", choices=["cosine", "minjerk"], default="cosine")
     ap.add_argument("--T", type=float, default=1.0)
     ap.add_argument("--t-end", type=float, default=None)
@@ -358,7 +358,7 @@ def main():
     ref_fn = make_reference(a.traj, T=a.T)
     t_end = a.t_end if a.t_end is not None else (6.0 if a.traj == "cosine" else a.T + 1.0)
     act = CableActuator()
-    cases = {"unassisted": Unassisted(), "GC oracle": GC(sigma_eff), f"GC nominal ({a.nominal} kg)": GC(sigma_nom),
+    cases = {"unassisted": Unassisted(), "GC true": GC(sigma_eff), f"GC nominal ({a.nominal} kg)": GC(sigma_nom),
              "AGC": AGC(gamma=a.gamma)}
     runs = {}
     for name, ctrl in cases.items():

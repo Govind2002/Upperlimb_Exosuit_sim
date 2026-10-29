@@ -185,7 +185,7 @@ if __name__ == "__main__":
     sig_nom = m_e * l_c + a.nominal * (l_e + l_w)
     cases = {
         "unassisted": Unassisted(),
-        "GC oracle": GC(sig_true),
+        "GC true": GC(sig_true),
         f"GC nominal({a.nominal}kg)": GC(sig_nom),
         "AGC": AGC(gamma=a.gamma),
     }

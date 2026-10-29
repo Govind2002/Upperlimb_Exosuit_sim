@@ -299,7 +299,7 @@ def main():
     ref_fn = make_reference(a.traj, T=a.T)
     t_end = a.t_end if a.t_end is not None else (6.0 if a.traj == "cosine" else a.T + 1.0)
     act = CableActuator()
-    cases = {"unassisted": Unassisted(), "GC oracle": GC(sigma_eff), f"GC nominal ({a.nominal} kg)": GC(sigma_nom),
+    cases = {"unassisted": Unassisted(), "GC true": GC(sigma_eff), f"GC nominal ({a.nominal} kg)": GC(sigma_nom),
              "AGC": AGC(gamma=a.gamma)}
     runs = {}
     for name, ctrl in cases.items():

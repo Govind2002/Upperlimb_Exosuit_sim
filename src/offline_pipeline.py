@@ -161,7 +161,7 @@ def run(controller, torque_fn, act, t_end=6.0, dt=1e-3, noise_acc=0.0, noise_tau
             log[key][k] = val
     log["t"] = t
     return log
-
+ 
 
 def rms(x):
     return float(np.sqrt(np.mean(np.square(x))))

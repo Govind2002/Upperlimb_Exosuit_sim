@@ -22,7 +22,10 @@ Run
   python cosim_mcg.py --plant mock --payload 2.5
   python cosim_mcg.py --plant opensim --payload 2.5 --selftest
   python cosim_mcg.py --plant opensim --payload 2.5 --traj minjerk --T 1 --metabolics --out results/mcg --plot
-"""
+
+  To Run: conda run -n opensim_scripting python F:/Govind/Upperlimb_sim/src/cosim_mcg.py --plant opensim 
+--payload 2.9 --traj minjerk --T 3 --metabolics --out results/mcg_modAGC --plot 
+  """
 import argparse
 import csv
 import math
@@ -358,8 +361,7 @@ def main():
     ref_fn = make_reference(a.traj, T=a.T)
     t_end = a.t_end if a.t_end is not None else (6.0 if a.traj == "cosine" else a.T + 1.0)
     act = CableActuator()
-    cases = {"unassisted": Unassisted(), "GC true": GC(sigma_eff), f"GC nominal ({a.nominal} kg)": GC(sigma_nom),
-             "AGC": AGC(gamma=a.gamma)}
+    cases = {"unassisted": Unassisted(), "GC true": GC(sigma_eff), "AGC": AGC(gamma=a.gamma)}
     runs = {}
     for name, ctrl in cases.items():
         mcg = MCG(idm, a.kp, a.kv, a.lookahead, a.human_knows_exo)
@@ -390,7 +392,7 @@ def main():
             ax[3].plot(L["t"], L["act_extensor_mean"], label=name); ax[4].plot(L["t"], L["sigma_hat"], label=name)
         ax[0].plot(b["t"], b["theta_ref"], "k--", label="reference"); ax[0].plot(b["t"], b["theta"], label="unassisted")
         ax[0].plot(runs["AGC"]["t"], runs["AGC"]["theta"], label="AGC")
-        for x, yl in zip(ax, ("theta (rad)", "muscle torque (N m)", "flexor activation", "extensor activation", "sigma_hat")):
+        for x, yl in zip(ax, ("Elbow Angle (rad)", "Human Torque (N m)", "flexor activation", "extensor activation", "Sigma estimate")):
             x.set_ylabel(yl); x.legend(fontsize=7); x.grid(alpha=0.3)
         ax[-1].set_xlabel("t (s)"); plt.tight_layout()
         plt.savefig(os.path.join(a.out or ".", "cosim_mcg.png"), dpi=130); print("saved plot")
